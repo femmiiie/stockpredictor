@@ -1,0 +1,1 @@
+RUN 'pip install dearpygui' FOR IT TO WORK
