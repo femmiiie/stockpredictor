@@ -51,7 +51,7 @@ def visualizer_setup():
   pass
 
 def filter_options(stocks : Trie):
-  input_text : str = gui.get_value("Search")
+  input_text : str = gui.get_value("Search").upper()
   filtered_items = [item for item in sorted(stocks.get_searched_list(input_text)) if input_text in item]
   gui.configure_item("Dropdown", items=filtered_items)
   #print(filtered_items)
