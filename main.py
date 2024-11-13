@@ -1,8 +1,9 @@
 import frontend
-
+import trie
 
 def main():
-  frontend.render_front()
+  placeholder = trie.Trie()
+  frontend.render_front(placeholder)
 
 
 if __name__ == "__main__":
