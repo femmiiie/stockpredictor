@@ -1,10 +1,11 @@
 import dearpygui.dearpygui as gui
+from globals import *
 from trie import *
 from time import sleep
 
 def render_front(stocks : Trie):
   gui.create_context()
-  gui.create_viewport(title="COP3530 Project 3")
+  gui.create_viewport(title="COP3530 Project 3", min_width=screen_size["width"], max_width=screen_size["width"], min_height=screen_size["height"] ,max_height=screen_size["height"])
   gui.setup_dearpygui()
 
   with gui.font_registry():
@@ -24,9 +25,8 @@ def render_front(stocks : Trie):
   gui.destroy_context()
 
 def button_setup():
-  button_size = [100, 40]
-  window_size = [gui.get_viewport_client_width(), gui.get_viewport_client_height()]
-  button_pos = [window_size[0] - button_size[0] - 50, window_size[1] - button_size[1] - 60]
+  button_size = [150, 80]
+  button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
   button = gui.add_button(label="Predict!", width=button_size[0], height=button_size[1])
   gui.set_item_pos(button, button_pos)
 
