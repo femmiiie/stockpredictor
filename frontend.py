@@ -59,19 +59,29 @@ def selector_setup(stocks : Trie):
   gui.bind_item_handler_registry("search", "search_reg")
 
 def range_setup():
-  gui.add_text("")
-  gui.add_text("Prediction Range:")
+  input_width = 150
+  default_start_time = datetime.now().strftime("%m/%d/%Y")
+  default_end_time = (datetime.now() + timedelta(days=7)).strftime("%m/%d/%Y")
 
-  with gui.group(horizontal=True):
-    gui.add_input_text(tag="start_date", default_value=datetime.now().strftime("%m/%d/%Y"), width=150)
-    gui.add_text("-")
-    gui.add_input_text(tag="end_date", default_value=(datetime.now() + timedelta(days=7)).strftime("%m/%d/%Y"), width=150)
+  with gui.group(tag="range_group") as range:
+    gui.add_text("")
+    gui.add_text("Prediction Range:")
 
-  with gui.item_handler_registry(tag="range_reg") as handler:
-    gui.add_item_deactivated_handler(callback=update_date_range)
+    #add_same_line is deprecated, so basic subgroup to get them all on the same line
+    with gui.group(tag="range_input_group", horizontal=True):
+      gui.add_input_text(tag="start_date", default_value=default_start_time, width=input_width)
+      gui.add_text("-", tag="seperator")
+      gui.add_input_text(tag="end_date", default_value=default_end_time, width=input_width)
 
-  gui.bind_item_handler_registry("start_date", "range_reg")
-  gui.bind_item_handler_registry("end_date", "range_reg")
+    with gui.item_handler_registry(tag="range_reg") as handler:
+      gui.add_item_deactivated_handler(callback=update_date_range)
+
+    gui.bind_item_handler_registry("start_date", "range_reg")
+    gui.bind_item_handler_registry("end_date", "range_reg")
+
+    #20 is an approximation for how much space the - char takes since it cannot be accessed directly on the first frame of runtime
+    range_obj_width = 2*input_width + 20
+    gui.set_item_pos(range, [screen_size["width"] - range_obj_width - 50, -30])
 
 def visualizer_setup():
   pass
