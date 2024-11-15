@@ -1,5 +1,5 @@
-import frontend
-import trie
+import frontend.frontend as frontend
+import classes.trie as trie
 
 def main():
   #placeholder values to test search and selection functionality
