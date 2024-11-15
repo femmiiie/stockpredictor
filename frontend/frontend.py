@@ -87,8 +87,16 @@ def range_setup():
     gui.set_item_pos(range, [screen_size["width"] - range_obj_width - 50, -30])
 
 def visualizer_setup():
-  pass
+  graph_size = [400, 400]
+  graph_pos = [10, screen_size["height"] - graph_size[1] - 60]
 
+  with gui.plot(tag="visualizer", width=graph_size[0], height=graph_size[1]):
+    gui.add_plot_axis(gui.mvXAxis, label="Date")
+    gui.add_plot_axis(gui.mvYAxis, label="High Price for Day", tag="y-axis")
+
+    gui.add_line_series(x=[0.5,1,2,3], y=[0.5,1,2,3], parent="y-axis")
+
+  gui.set_item_pos("visualizer", graph_pos)
 
 def credits_setup():
   gui.add_text("Created by the Soon to be Richest Team in COP3530")
