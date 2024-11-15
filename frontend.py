@@ -20,6 +20,12 @@ def render_front(stocks : Trie):
     range_setup()
     visualizer_setup()
 
+  with gui.window(tag="Credits", show=False):
+    pass
+
+  with gui.window(tag="Predictor", show=False):
+    pass
+
   gui.show_viewport()
   gui.set_primary_window("Primary", True)
   gui.start_dearpygui()
@@ -27,9 +33,15 @@ def render_front(stocks : Trie):
 
 def button_setup():
   button_size = [150, 60]
-  button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
-  button = gui.add_button(label="Predict!", width=button_size[0], height=button_size[1])
-  gui.set_item_pos(button, button_pos)
+  predict_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
+  credits_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - 2*button_size[1] - 70]
+
+  predict_button = gui.add_button(label="Predict!", width=button_size[0], height=button_size[1], callback=(lambda: swap_visible_screen(3)))
+  credits_button = gui.add_button(label="Credits", width=button_size[0], height=button_size[1], callback=(lambda: swap_visible_screen(2)))
+
+  gui.set_item_pos(predict_button, predict_button_pos)
+  gui.set_item_pos(credits_button, credits_button_pos)
+
 
 def selector_setup(stocks : Trie):
   gui.add_text("Select a Stock:")
@@ -90,4 +102,23 @@ def update_date_range(sender):
 
     if start_date > end_date:
       gui.set_value("start_date", end_date.strftime(date_format))
-      gui.set_value("end_date", start_date.strftime(date_format))    
+      gui.set_value("end_date", start_date.strftime(date_format))
+
+def swap_visible_screen(swap_to : int):
+  if swap_to == 1:
+    gui.show_item("Primary")
+    gui.set_primary_window("Primary", True)
+    gui.hide_item("Credits")
+    gui.hide_item("Predictor")
+
+  elif swap_to == 2:
+    gui.hide_item("Primary")
+    gui.show_item("Credits")
+    gui.set_primary_window("Credits", True)
+    gui.hide_item("Predictor")
+
+  elif swap_to == 3:
+    gui.hide_item("Primary")
+    gui.hide_item("Credits")
+    gui.show_item("Predictor")
+    gui.set_primary_window("Predictor", True)
