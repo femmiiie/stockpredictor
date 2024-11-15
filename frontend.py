@@ -21,7 +21,9 @@ def render_front(stocks : Trie):
     visualizer_setup()
 
   with gui.window(tag="Credits", show=False):
-    pass
+    gui.bind_font(default_font)
+    
+    credits_setup()
 
   with gui.window(tag="Predictor", show=False):
     pass
@@ -41,7 +43,6 @@ def button_setup():
 
   gui.set_item_pos(predict_button, predict_button_pos)
   gui.set_item_pos(credits_button, credits_button_pos)
-
 
 def selector_setup(stocks : Trie):
   gui.add_text("Select a Stock:")
@@ -105,6 +106,7 @@ def update_date_range(sender):
       gui.set_value("end_date", start_date.strftime(date_format))
 
 def swap_visible_screen(swap_to : int):
+
   if swap_to == 1:
     gui.show_item("Primary")
     gui.set_primary_window("Primary", True)
@@ -122,3 +124,14 @@ def swap_visible_screen(swap_to : int):
     gui.hide_item("Credits")
     gui.show_item("Predictor")
     gui.set_primary_window("Predictor", True)
+
+def credits_setup():
+  gui.add_text("Created by the Soon to be Richest Team in COP3530")
+  gui.add_text("Sandro Mocevic - Frontend Development")
+  gui.add_text("Nouri Clarke - TBD")
+  gui.add_text("Aimar Murua - TBD")
+
+  button_size = [150, 60]
+  back_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
+  back_button = gui.add_button(label="Back", width=button_size[0], height=button_size[1], callback=(lambda: swap_visible_screen(1)))
+  gui.set_item_pos(back_button, back_button_pos)
