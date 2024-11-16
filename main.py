@@ -11,6 +11,7 @@ def main():
   placeholder.insert("rat")
 
   frontend.render_front(placeholder)
+  print("hello world")
 
 
 if __name__ == "__main__":
