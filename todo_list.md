@@ -12,4 +12,3 @@ program flow:
     pass parameters into prediction code
     run the algorithm
     update frontend to show predictions
-
