@@ -12,18 +12,24 @@ from frontend.handlers import *
 
 def render_front(stocks : Trie):
   gui.create_context()
-  gui.create_viewport(title="COP3530 Project 3", min_width=screen_size["width"], max_width=screen_size["width"], min_height=screen_size["height"] ,max_height=screen_size["height"])
+  gui.create_viewport(
+    title="COP3530 Project 3", 
+    min_width=screen_size["width"], 
+    min_height=screen_size["height"], 
+    max_width=screen_size["width"], 
+    max_height=screen_size["height"]
+    )
   gui.setup_dearpygui()
 
   with gui.font_registry():
-    default_font = gui.add_font("Arimo\Arimo-VariableFont_wght.ttf", 30)
+    default_font = gui.add_font("Arimo\\Arimo-VariableFont_wght.ttf", 30)
     gui.bind_font(default_font)
 
   with gui.window(tag="Primary"):
+    visualizer_setup()
     selector_setup(stocks)
     button_setup()
     range_setup()
-    visualizer_setup()
 
   with gui.window(tag="Credits", show=False):
     credits_setup()
@@ -87,19 +93,36 @@ def range_setup():
     gui.set_item_pos(range, [screen_size["width"] - range_obj_width - 50, -30])
 
 def visualizer_setup():
-  graph_size = [400, 400]
+  graph_size = [600, 400]
   graph_pos = [10, screen_size["height"] - graph_size[1] - 60]
 
-  with gui.plot(tag="visualizer", width=graph_size[0], height=graph_size[1]):
+  #currently just a regular xy ploy, may change to a candlestick plot if i feel like it
+  with gui.plot(
+    tag="visualizer", 
+    width=graph_size[0], 
+    height=graph_size[1], 
+    no_menus=True, 
+    no_mouse_pos=True, 
+    no_box_select=True, 
+    no_inputs=True):
+
     gui.add_plot_axis(gui.mvXAxis, label="Date")
     gui.add_plot_axis(gui.mvYAxis, label="High Price for Day", tag="y-axis")
 
-    gui.add_line_series(x=[0.5,1,2,3], y=[0.5,1,2,3], parent="y-axis")
+    gui.add_line_series(x=[0,1,2,3], y=[0,1,2,3], parent="y-axis")
 
+  #the background frame of the graph object has really weird padding
+  #so i made the color the same as the global bg to hide it
+  with gui.theme() as vis_theme:
+    with gui.theme_component(gui.mvAll):
+      gui.add_theme_color(gui.mvThemeCol_FrameBg, (37, 37, 37))
+
+  gui.bind_item_theme("visualizer", vis_theme)
   gui.set_item_pos("visualizer", graph_pos)
 
 def credits_setup():
   gui.add_text("Created by the Soon to be Richest Team in COP3530")
+  gui.add_text("")
   gui.add_text("Sandro Mocevic - Frontend Development")
   gui.add_text("Nouri Clarke - TBD")
   gui.add_text("Aimar Murua - TBD")

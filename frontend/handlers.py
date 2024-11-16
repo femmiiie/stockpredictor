@@ -12,7 +12,6 @@ def filter_options(stocks : Trie):
   input_text : str = gui.get_value("search").upper()
   filtered_items = [item for item in sorted(stocks.get_searched_list(input_text)) if input_text in item]
   gui.configure_item("dropdown", items=filtered_items)
-  #print(filtered_items)
 
 def show_listbox():
   gui.show_item("dropdown")
@@ -37,6 +36,7 @@ def update_date_range():
       gui.set_value("start_date", end_date.strftime(date_format))
       gui.set_value("end_date", start_date.strftime(date_format))
 
+#very basic state logic since the app only has 3 screens to deal with
 def swap_visible_screen(swap_to : int):
 
   if swap_to == 1:
