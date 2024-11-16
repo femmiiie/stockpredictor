@@ -16,7 +16,7 @@ def render_front(stocks : Trie):
   gui.setup_dearpygui()
 
   with gui.font_registry():
-    default_font = gui.add_font("Arimo/Arimo-VariableFont_wght.ttf", 30)
+    default_font = gui.add_font("Arimo\Arimo-VariableFont_wght.ttf", 30)
     gui.bind_font(default_font)
 
   with gui.window(tag="Primary"):
