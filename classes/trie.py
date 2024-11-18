@@ -1,16 +1,16 @@
 class Node:
   def __init__(self):
     self.children : dict = {}
-    self.end = False
+    self.index = 0
 
 class Trie:
   def __init__(self):
     self.root = Node()
 
-  #basic trie insert
-  def insert(self, string : str):
-    curr_node = self.root
 
+  #basic trie insert
+  def insert(self, string : str, index : int):
+    curr_node = self.root
     string = string.upper()
 
     for char in string:
@@ -19,7 +19,25 @@ class Trie:
 
       curr_node = curr_node.children[char]
 
-    curr_node.end = True
+    curr_node.index = index
+
+  
+  def insert_arr(self, arr : list):
+    for index, name in enumerate(arr):
+      self.insert(name, index)
+
+
+  def get_index(self, string : str):
+    curr_node = self.root
+    string = string.upper()
+
+    for char in string:
+      if char not in curr_node.children:
+        return 0
+
+      curr_node = curr_node.children[char]
+
+    return curr_node.index
 
 
   def get_searched_list(self, starter : str) -> list:
@@ -35,6 +53,7 @@ class Trie:
     self.searched_list_helper(return_arr, curr_node, starter)
 
     return return_arr
+
 
   def searched_list_helper(self, return_arr : list, curr_node : Node, string : str):
     if not curr_node.children:
