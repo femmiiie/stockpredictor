@@ -42,6 +42,7 @@ def render_front(stocks : Trie):
   gui.start_dearpygui()
   gui.destroy_context()
 
+
 def button_setup():
   button_size = [150, 60]
   predict_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
@@ -52,6 +53,7 @@ def button_setup():
 
   gui.set_item_pos(predict_button, predict_button_pos)
   gui.set_item_pos(credits_button, credits_button_pos)
+
 
 def selector_setup(stocks : Trie):
   gui.add_text("Select a Stock:")
@@ -66,6 +68,7 @@ def selector_setup(stocks : Trie):
     gui.add_item_deactivated_handler(callback=hide_listbox)
 
   gui.bind_item_handler_registry("search", "search_reg")
+
 
 def range_setup():
   input_width = 150
@@ -91,6 +94,7 @@ def range_setup():
     #20 is an approximation for how much space the - char takes since it cannot be accessed directly on the first frame of runtime
     range_obj_width = 2*input_width + 20
     gui.set_item_pos(range, [screen_size["width"] - range_obj_width - 50, -30])
+
 
 def visualizer_setup():
   graph_size = [600, 400]
@@ -119,6 +123,7 @@ def visualizer_setup():
 
   gui.bind_item_theme("visualizer", vis_theme)
   gui.set_item_pos("visualizer", graph_pos)
+
 
 def credits_setup():
   gui.add_text("Created by the Soon to be Richest Team in COP3530")

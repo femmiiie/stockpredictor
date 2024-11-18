@@ -8,21 +8,26 @@ import dearpygui.dearpygui as gui
 #project imports
 from classes.trie import *
 
+
 def filter_options(stocks : Trie):
   input_text : str = gui.get_value("search").upper()
   filtered_items = [item for item in sorted(stocks.get_searched_list(input_text)) if input_text in item]
   gui.configure_item("dropdown", items=filtered_items)
 
+
 def show_listbox():
   gui.show_item("dropdown")
+
 
 def hide_listbox():
   sleep(0.1)
   gui.hide_item("dropdown")
 
+
 def select_item(sender):
   text = gui.get_value(sender)
   gui.set_value("search", text)
+
 
 def update_date_range():
     start_val = gui.get_value("start_date")
