@@ -10,12 +10,33 @@ class HashMap:
         self.capacity = initial_capacity
         self.size = 0
         self.buckets = [[] for _ in range(self.capacity)]
+        self.load_threshold = 0.7
 
-    def _hash(self, key):
-        return hash(key) % self.capacity # The hash function works even if the key is a date like 2013-01-13
+
+    #we know the all of our inputs are gonna be date formats
+    def hash(self, key):
+        year = int(key[0:4])
+        month = int(key[5:7])
+        day = int(key[8:10])
+        
+        val = year * 10000 + month * 10 + day
+        return val % self.capacity
+        # return hash(key) % self.capacity # The hash function works even if the key is a date like 2013-01-13
+
+    def rehash(self):
+        old = self.buckets
+        self.capacity *= 2
+        self.buckets = [[] for _ in range(self.capacity)]
+        self.size = 0
+        for bucket in old:
+            for k, v in bucket:
+                self.put(k, v)
 
     def put(self, key, value):
-        index = self._hash(key)
+        if self.size / self.capacity > self.load_threshold:
+            self.rehash()
+
+        index = self.hash(key)
         bucket = self.buckets[index]
 
         for i, (k, v) in enumerate(bucket):
@@ -27,7 +48,7 @@ class HashMap:
         self.size += 1
 
     def get(self, key):
-        index = self._hash(key)
+        index = self.hash(key)
         bucket = self.buckets[index]
 
         for k, v in bucket:
