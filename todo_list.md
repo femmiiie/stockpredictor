@@ -1,5 +1,6 @@
-RUN 'pip install dearpygui' FOR IT TO WORK
-
+Dependencies
+pip install dearpygui
+pip install yfinance
 
 program flow:
   check if data is different from processed data
