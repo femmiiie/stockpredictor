@@ -14,9 +14,8 @@ def main():
     datasets.download_data()
 
   stock_list = []
-  stock_info = []
 
-  datasets.populate_data(stock_list, stock_info)
+  datasets.get_stock_list(stock_list)
 
   #placeholder values to test search and selection functionality
   placeholder = trie.Trie()
