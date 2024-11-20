@@ -1,11 +1,26 @@
+#stl imports
+from os import path
+
+#project imports
 import frontend.frontend as frontend
 import classes.trie as trie
+import classes.hashmap as hashmap
+import datasets
+
 
 def main():
+
+  if not path.exists("stock_info.csv"):
+    datasets.download_data()
+
+  stock_list = []
+  stock_info = []
+
+  datasets.populate_data(stock_list, stock_info)
+
   #placeholder values to test search and selection functionality
-  arr = ["word", "ward", "wart", "worry", "rat"]
   placeholder = trie.Trie()
-  placeholder.insert_arr(arr)
+  placeholder.insert_arr(stock_list)
 
   frontend.render_front(placeholder)
 """
