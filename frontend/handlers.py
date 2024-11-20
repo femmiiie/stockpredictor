@@ -7,6 +7,7 @@ import dearpygui.dearpygui as gui
 
 #project imports
 from classes.trie import *
+from globals import *
 
 
 def filter_options(stocks : Trie):
@@ -41,6 +42,13 @@ def update_date_range():
       gui.set_value("start_date", end_date.strftime(date_format))
       gui.set_value("end_date", start_date.strftime(date_format))
 
+
+
+def reset_loading_screen():
+  print("here")
+  gui.set_value(progress_bar, 0)
+
+
 #very basic state logic since the app only has 3 screens to deal with
 def swap_visible_screen(swap_to : int):
 
@@ -49,6 +57,7 @@ def swap_visible_screen(swap_to : int):
     gui.set_primary_window("Primary", True)
     gui.hide_item("Credits")
     gui.hide_item("Predictor")
+    gui.hide_item("Loading")
 
   elif swap_to == 2:
     gui.hide_item("Primary")

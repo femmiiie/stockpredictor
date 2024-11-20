@@ -1,46 +1,44 @@
 #stl imports
 from os import path
 
+#external library imports
+import dearpygui.dearpygui as gui
+
 #project imports
 import frontend.frontend as frontend
+import frontend.handlers as handlers
 import classes.trie as trie
 import classes.hashmap as hashmap
 import datasets
 
 
 def main():
+  frontend.setup()
 
+  gui.set_frame_callback(2, lambda: post_render_execution(stock_names))
+
+  stock_names = trie.Trie()
+  frontend.render_front(stock_names)
+
+
+def post_render_execution(stock_names : trie.Trie):
   if not path.exists("stock_info.csv"):
     datasets.download_data()
 
-  stock_list = []
+  handlers.reset_loading_screen() #resets loading screen
 
-  datasets.get_stock_list(stock_list)
+  stock_list = datasets.get_stock_list()
+  stock_names.insert_arr(stock_list)
 
-  #placeholder values to test search and selection functionality
-  placeholder = trie.Trie()
-  placeholder.insert_arr(stock_list)
+  handlers.swap_visible_screen(1) #swaps to main screen
 
-  frontend.render_front(placeholder)
+
 """
   preferred data format for proccessing
   list[str] of each name to pass into Trie
-  list[HashMap] for the daily info of each stock
-
-  hashmap structure
-  {
-  'YYYY-MM-DD': [open, close, adj_close, high, low, volume]
-  ...
-  ...
-  ...
-  'YYYY-MM-DD': [open, close, adj_close, high, low, volume]
-  }
-
-  keep the list 1-to-1 for easy indexing 
 
   Ex:
   stock_names[0] == "AAPL"
-  stocks[0] == All stock data for AAPL
 """
 
 if __name__ == "__main__":

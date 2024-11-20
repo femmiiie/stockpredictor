@@ -9,8 +9,7 @@ from globals import *
 from classes.trie import *
 from frontend.handlers import *
 
-
-def render_front(stocks : Trie):
+def setup():
   gui.create_context()
   gui.create_viewport(
     title="COP3530 Project 3", 
@@ -21,11 +20,16 @@ def render_front(stocks : Trie):
     )
   gui.setup_dearpygui()
 
+def render_front(stocks : Trie):
+
   with gui.font_registry():
     default_font = gui.add_font("Arimo\\Arimo-VariableFont_wght.ttf", 30)
     gui.bind_font(default_font)
 
-  with gui.window(tag="Primary"):
+  with gui.window(tag="Loading"):
+    loading_setup()
+
+  with gui.window(tag="Primary", show=False):
     visualizer_setup()
     selector_setup(stocks)
     button_setup()
@@ -38,7 +42,7 @@ def render_front(stocks : Trie):
     pass
 
   gui.show_viewport()
-  gui.set_primary_window("Primary", True)
+  gui.set_primary_window("Loading", True)
   gui.start_dearpygui()
   gui.destroy_context()
 
@@ -123,6 +127,15 @@ def visualizer_setup():
 
   gui.bind_item_theme("visualizer", vis_theme)
   gui.set_item_pos("visualizer", graph_pos)
+
+
+def loading_setup():
+
+  with gui.group(tag="loading_group"):
+    gui.add_text("Sit Tight, the Program is")
+    gui.add_text("LOADING")
+
+    gui.add_progress_bar(tag=progress_bar)
 
 
 def credits_setup():

@@ -1,7 +1,15 @@
-from classes.hashmap import *
+#stl imports
+import csv
+
+#external library imports
 import yfinance as yf
 import pandas as pd
-import csv
+from dearpygui.dearpygui import set_value
+
+#project imports
+from classes.hashmap import *
+from globals import *
+
 
 def download_data():
 
@@ -14,15 +22,16 @@ def download_data():
   # data = yf.download(sp500_tickers, start='2022-01-01', end='2022-01-31', group_by='ticker')
 
   failed = [stock for stock in sp500_tickers if stock not in data.columns.levels[0]]
-  print(failed)
+
+  total_stocks = len(sp500_tickers) - len(failed)
 
   with open("stock_info.csv", "x", newline='') as file:
     writer = csv.writer(file, delimiter="|")
 
-    for stock in sp500_tickers:
+    for i, stock in enumerate(sp500_tickers, start=1):
       row_count = sum(1 for _, row in data[stock].iterrows() if not pd.isna(row.iloc[0]))
 
-      if stock in failed or row_count == 0:
+      if stock in failed or row_count == 0: #prevents stocks with no data getting written
         continue
 
       writer.writerow([stock, row_count])
@@ -36,39 +45,22 @@ def download_data():
 
         writer.writerow(list)
 
-      print(f"{stock} writing finished")
+      set_value(progress_bar, i/total_stocks) #updates progress bar
+      # print(f"{stock} writing finished")
 
 
-def get_stock_list(name_list : list):
-  
+def get_stock_list():
+  name_list = []
+  count = 0
+
   with open("stock_info.csv", mode="r") as file:
     reader = csv.reader(file, delimiter='|')
     for line in reader:
 
       if (len(line)) == 2:
         name_list.append(line[0])
-    
-
-
-
-# stocks_list = HashMap(len(sp500_tickers))
-
-# for i in sp500_tickers:
-#     data_stock = data[i]
-#     size = len(data_stock)
-#     stock = HashMap(size)
-#     for i,k in enumerate(data_stock.index):
-#         value = []
-#         date_string = str(k)
-#         parsed_date = datetime.fromisoformat(date_string)
-#         cleaned_date = parsed_date.strftime('%Y-%m-%d')
-#         for j in data_stock.iloc[i]:
-#             value.append(j)
-
-#         stock.put(cleaned_date,value)
-
-#     stocks_list.put(i,stock)
-
-# print(stocks_list.get("AAPL"))
-
+        count += 1
+        set_value(progress_bar, count/503)
+      
+  return name_list
 
