@@ -1,5 +1,7 @@
 ./libraries
 
+stock_info.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
