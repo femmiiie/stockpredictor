@@ -61,10 +61,13 @@ def get_stock_list():
   return name_list
 
 
-async def pull_stock_info(stock_name):
+async def pull_stock_info(stock_name : str):
   
   if not stock_name:
     return
+
+  stock_name = stock_name.upper()
+  print("pulling data")
 
   async with data_lock: #prevents other code from using the hashmap while updating
     with open("stock_info.csv", mode="r") as file:
@@ -80,8 +83,7 @@ async def pull_stock_info(stock_name):
       if line_count == 0:
         return
 
-      del current_stock_data #get rid of current data to free up memory
-      current_stock_data = HashMap(int(line_count/0.7))
+      current_stock_data = HashMap(int(int(line_count)/0.7))
 
       for line in reader:
         if len(line) == 2: #check if we are done
@@ -89,5 +91,6 @@ async def pull_stock_info(stock_name):
 
         current_stock_data.put(line[0], line[1:-1])
 
+  print("done pulling data")
 
   #to-do: add callbacks so visualizer can update data

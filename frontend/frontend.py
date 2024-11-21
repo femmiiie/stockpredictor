@@ -8,7 +8,7 @@ import dearpygui.dearpygui as gui
 from globals import *
 from classes.trie import *
 from frontend.handlers import *
-from datasets import pull_stock_info
+
 
 def setup():
   gui.create_context()
@@ -71,7 +71,7 @@ def selector_setup(stocks : Trie):
   with gui.item_handler_registry(tag="search_reg") as handler:
     gui.add_item_active_handler(callback=show_listbox)
     gui.add_item_deactivated_handler(callback=hide_listbox)
-    gui.add_item_deactivated_handler(callback=lambda: pull_stock_info(gui.get_value("search")))
+    gui.add_item_deactivated_handler(callback=pull)
 
   gui.bind_item_handler_registry("search", "search_reg")
 

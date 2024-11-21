@@ -1,11 +1,13 @@
 #stl imports
 from datetime import datetime
+import asyncio
 from time import sleep
 
 #external library imports
 import dearpygui.dearpygui as gui
 
 #project imports
+from datasets import *
 from classes.trie import *
 from globals import *
 
@@ -28,7 +30,13 @@ def hide_listbox():
 def select_item(sender):
   text = gui.get_value(sender)
   gui.set_value("search", text)
+  pull()
 
+def pull():
+  sleep(0.1)
+  loop = asyncio.new_event_loop()
+  loop.run_until_complete(pull_stock_info(gui.get_value("search")))
+  # update_graph()
 
 def update_date_range():
     start_val = gui.get_value("start_date")
