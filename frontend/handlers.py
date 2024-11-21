@@ -45,7 +45,6 @@ def update_date_range():
 
 
 def reset_loading_screen():
-  print("here")
   gui.set_value(progress_bar, 0)
 
 

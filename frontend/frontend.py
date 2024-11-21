@@ -8,6 +8,7 @@ import dearpygui.dearpygui as gui
 from globals import *
 from classes.trie import *
 from frontend.handlers import *
+from datasets import pull_stock_info
 
 def setup():
   gui.create_context()
@@ -70,6 +71,7 @@ def selector_setup(stocks : Trie):
   with gui.item_handler_registry(tag="search_reg") as handler:
     gui.add_item_active_handler(callback=show_listbox)
     gui.add_item_deactivated_handler(callback=hide_listbox)
+    gui.add_item_deactivated_handler(callback=lambda: pull_stock_info(gui.get_value("search")))
 
   gui.bind_item_handler_registry("search", "search_reg")
 
@@ -104,7 +106,7 @@ def visualizer_setup():
   graph_size = [600, 400]
   graph_pos = [10, screen_size["height"] - graph_size[1] - 60]
 
-  #currently just a regular xy ploy, may change to a candlestick plot if i feel like it
+  #currently just a regular xy plot, may change to a candlestick plot if i feel like it
   with gui.plot(
     tag="visualizer", 
     width=graph_size[0], 
@@ -117,7 +119,7 @@ def visualizer_setup():
     gui.add_plot_axis(gui.mvXAxis, label="Date")
     gui.add_plot_axis(gui.mvYAxis, label="High Price for Day", tag="y-axis")
 
-    gui.add_line_series(x=[0,1,2,3], y=[0,1,2,3], parent="y-axis")
+
 
   #the background frame of the graph object has really weird padding
   #so i made the color the same as the global bg to hide it
@@ -135,7 +137,10 @@ def loading_setup():
     gui.add_text("Sit Tight, the Program is")
     gui.add_text("LOADING")
 
-    gui.add_progress_bar(tag=progress_bar)
+    gui.add_progress_bar(tag=progress_bar, width=300)
+
+  group_pos = [screen_size["width"]/2 - 150, screen_size["height"]/2 - 100]
+  gui.set_item_pos("loading_group", group_pos)
 
 
 def credits_setup():
