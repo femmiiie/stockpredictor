@@ -9,7 +9,7 @@ from dearpygui.dearpygui import set_value
 
 #project imports
 from classes.hashmap import *
-from globals import *
+import globals
 
 
 def download_data():
@@ -42,7 +42,7 @@ def download_data():
 
         writer.writerow(list)
 
-      set_value(progress_bar, i/total_stocks) #updates progress bar
+      set_value(globals.progress_bar, i/total_stocks) #updates progress bar
 
 
 def get_stock_list():
@@ -56,7 +56,7 @@ def get_stock_list():
       if (len(line)) == 2:
         name_list.append(line[0])
         count += 1
-        set_value(progress_bar, count/503)
+        set_value(globals.progress_bar, count/503)
       
   return name_list
 
@@ -69,7 +69,7 @@ async def pull_stock_info(stock_name : str):
   stock_name = stock_name.upper()
   print("pulling data")
 
-  async with data_lock: #prevents other code from using the hashmap while updating
+  async with globals.data_lock: #prevents other code from using the hashmap while updating
     with open("stock_info.csv", mode="r") as file:
       reader = csv.reader(file, delimiter="|")
       line_count = 0
@@ -83,14 +83,14 @@ async def pull_stock_info(stock_name : str):
       if line_count == 0:
         return
 
-      current_stock_data = HashMap(int(int(line_count)/0.7))
+      globals.current_stock_data = HashMap(int(int(line_count)/0.7))
 
       for line in reader:
         if len(line) == 2: #check if we are done
           break
 
-        current_stock_data.put(line[0], line[1:-1])
+        globals.current_stock_data[line[0]] = line[1:-1]
+
+  print(globals.current_stock_data)
 
   print("done pulling data")
-
-  #to-do: add callbacks so visualizer can update data
