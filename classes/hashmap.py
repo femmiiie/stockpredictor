@@ -1,9 +1,4 @@
-# So my idea for the hash map is that each "bucket" inside the array is a stock, then we append a tuple
-# with a key which is the date and a value which is a vector with the stock properties like open prize,
-# close prize, volume...
-# For example: key = 2013-01-02 and value = [16.6,19.6,19.8,19.34,19.77,56051800] which correspond to
-# Adj close, close, high, low, open and volume.
-# Adj close: Adjusted close is the closing price after adjustments for all applicable splits and dividend distributions.
+from copy import deepcopy
 
 class HashMap:
 	def __init__(self, initial_capacity=10):
@@ -34,8 +29,8 @@ class HashMap:
 				bucket[i] = (key, value)
 				return
 
-			bucket.append((key, value))
-			self.size += 1
+		bucket.append((key, value))
+		self.size += 1
 
 
 	def get(self, key):
@@ -64,7 +59,7 @@ class HashMap:
 
 
 	def __getitem__(self, a):
-		self.get(a)
+		return self.get(a)
 
 
 	def keys(self):
@@ -72,3 +67,5 @@ class HashMap:
 		for bucket in self.buckets:
 			for key, _ in bucket:
 				lst.append(key)
+		
+		return lst

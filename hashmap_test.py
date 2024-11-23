@@ -11,7 +11,7 @@ def gen_date(start_year=1900, end_year=2100):
     return random_date.strftime("%Y-%m-%d")
 
 def hashmap_perf_test():
-  date_list = [gen_date() for i in range(10000)]
+  date_list = [gen_date() for i in range(100)]
 
   def_start = timer()
   default = {}
@@ -28,10 +28,10 @@ def hashmap_perf_test():
   cust_start = timer()
   custom = HashMap()
   for i in date_list:
-    custom.put(i, i)
+    custom[i] = i
 
   for i in date_list:
-    custom.get(i)
+    print(custom[i])
 
   cust_end = timer()
   cust_difference = cust_end - cust_start
