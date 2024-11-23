@@ -1,7 +1,6 @@
 class Node:
   def __init__(self):
     self.children : dict = {}
-    self.index = 0
 
 class Trie:
   def __init__(self):
@@ -27,17 +26,17 @@ class Trie:
       self.insert(name, index)
 
 
-  def get_index(self, string : str):
+  def get_first_item(self):
     curr_node = self.root
-    string = string.upper()
+    name = ""
 
-    for char in string:
-      if char not in curr_node.children:
-        return 0
+    while curr_node.children:
+      val = next(iter(curr_node.children.keys()))
+      name += val
+      curr_node = curr_node.children[val]
 
-      curr_node = curr_node.children[char]
 
-    return curr_node.index
+    return name
 
 
   def get_searched_list(self, starter : str) -> list:

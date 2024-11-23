@@ -30,6 +30,7 @@ def post_render_execution(stock_names : trie.Trie):
   stock_list = datasets.get_stock_list()
   stock_names.insert_arr(stock_list)
 
+  handlers.set_defaults(stock_names.get_first_item())
   handlers.swap_visible_screen(1) #swaps to main screen
 
 

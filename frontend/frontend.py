@@ -71,7 +71,7 @@ def selector_setup(stocks : Trie):
   with gui.item_handler_registry(tag="search_reg") as handler:
     gui.add_item_active_handler(callback=show_listbox)
     gui.add_item_deactivated_handler(callback=hide_listbox)
-    gui.add_item_deactivated_handler(callback=pull)
+    # gui.add_item_deactivated_handler(callback=pull)
 
   gui.bind_item_handler_registry("search", "search_reg")
 
@@ -113,13 +113,11 @@ def visualizer_setup():
     height=graph_size[1], 
     no_menus=True, 
     no_mouse_pos=True, 
-    no_box_select=True, 
+    no_box_select=True,
     no_inputs=True):
 
-    gui.add_plot_axis(gui.mvXAxis, label="Date")
-    gui.add_plot_axis(gui.mvYAxis, label="High Price for Day", tag="y-axis")
-
-
+    gui.add_plot_axis(gui.mvXAxis, label="Date", tag="x-axis", auto_fit=True)
+    gui.add_plot_axis(gui.mvYAxis, label="Price", tag="y-axis", auto_fit=True)
 
   #the background frame of the graph object has really weird padding
   #so i made the color the same as the global bg to hide it
