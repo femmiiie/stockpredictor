@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 class HashMap:
 	def __init__(self, initial_capacity=10):
 		self.capacity = initial_capacity

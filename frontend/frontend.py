@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 import dearpygui.dearpygui as gui
 
 #project imports
-from globals import *
 from classes.trie import *
 from frontend.handlers import *
+from globals import *
 
 
 def setup():
@@ -71,7 +71,7 @@ def selector_setup(stocks : Trie):
   with gui.item_handler_registry(tag="search_reg") as handler:
     gui.add_item_active_handler(callback=show_listbox)
     gui.add_item_deactivated_handler(callback=hide_listbox)
-    # gui.add_item_deactivated_handler(callback=pull)
+    gui.add_item_deactivated_handler(callback=pull_wrapper)
 
   gui.bind_item_handler_registry("search", "search_reg")
 

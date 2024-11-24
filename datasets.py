@@ -1,11 +1,11 @@
 #stl imports
 import csv
-import asyncio
+from os import path
 
 #external library imports
-import yfinance as yf
-import pandas as pd
 from dearpygui.dearpygui import set_value
+import pandas as pd
+import yfinance as yf
 
 #project imports
 from classes.hashmap import *
@@ -13,6 +13,8 @@ import globals
 
 
 def download_data():
+  if path.exists("stock_info.csv"):
+    return
 
   #edit if you want to pull custom data, we use the full list of current S&P 500 companies
   url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'

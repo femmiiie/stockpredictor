@@ -1,15 +1,15 @@
 #stl imports
-from datetime import datetime
 import asyncio
+from datetime import datetime
 from time import sleep
 
 #external library imports
 import dearpygui.dearpygui as gui
 
 #project imports
-from datasets import *
 from classes.hashmap import *
 from classes.trie import *
+from datasets import *
 import globals
 
 
@@ -67,6 +67,9 @@ async def update_graph():
 
   
   #reformat ticks to match available stock data for ticker
+  if len(dates) < time_range:
+    time_range = len(dates)
+  
   gui.set_axis_ticks("x-axis", ((dates[-time_range], len(dates) - time_range), (dates[int(-time_range/2)], len(dates) - int(time_range/2)), (dates[-1], len(dates) - 1)))
 
   gui.delete_item("candlestick")
