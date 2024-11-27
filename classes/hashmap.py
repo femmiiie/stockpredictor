@@ -67,3 +67,13 @@ class HashMap:
 				lst.append(key)
 		
 		return lst
+	
+	def items(self):
+	 for bucket in self.buckets:
+			for key, val in bucket:
+				yield key, val
+	
+	def values(self):
+		for bucket in self.buckets:
+			for _, val in bucket:
+				yield val
