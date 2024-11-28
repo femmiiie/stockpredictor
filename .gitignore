@@ -1,6 +1,7 @@
 ./libraries
 
 stock_info.csv
+stock_model.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
