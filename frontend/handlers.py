@@ -10,7 +10,7 @@ import dearpygui.dearpygui as gui
 from classes.hashmap import *
 from classes.trie import *
 from data.datasets import *
-import globals
+import data.globals as globals
 
 
 def filter_options(stocks : Trie):
