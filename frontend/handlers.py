@@ -9,7 +9,7 @@ import dearpygui.dearpygui as gui
 #project imports
 from classes.hashmap import *
 from classes.trie import *
-from datasets import *
+from data.datasets import *
 import globals
 
 
