@@ -1,16 +1,21 @@
-from os import path
-from classes.hashmap import *
-import pandas as pd
-import data.datasets as datasets
-import globals
+#stl imports
 import asyncio
-import numpy as np
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, cross_val_score
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
-import matplotlib.pyplot as plt
 from datetime import timedelta, datetime
 import joblib
+
+#external library imports
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, cross_val_score
+
+#project imports
+from classes.hashmap import *
+import data.datasets as datasets
+import data.globals as globals
+
 
 def train_model(stock_data: HashMap):
    extracted_data = {key: value for key, value in stock_data.items()}
@@ -104,15 +109,12 @@ def train_model(stock_data: HashMap):
 
 
 def train_test():
-    # Simplified for testing
-    if not path.exists("stock_info.csv"):
-        print("Error: stock_info.csv not found. Run datasets.download_data() first.")
-        return
+    datasets.download_data()
 
     # Get stock list and choose a stock for testing
     print(f"getting stocks")
     stock_list = datasets.get_stock_list()
-    print(f"Available stocks: {stock_list}")
+    # print(f"Available stocks: {stock_list}")
     print(f"got stocks")
 
     stock_name = stock_list[0]  # Replace with desired stock or user input
