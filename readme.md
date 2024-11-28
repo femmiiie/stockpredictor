@@ -4,3 +4,4 @@ Welcome to the world's best stock predictor out there!
 Dependencies:
 dearpygui
 yfinance
+scikit-learn
