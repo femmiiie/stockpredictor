@@ -7,7 +7,7 @@ import dearpygui.dearpygui as gui
 #project imports
 from classes.trie import *
 from frontend.handlers import *
-from globals import *
+from data.globals import *
 
 
 def setup():

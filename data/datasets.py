@@ -11,7 +11,7 @@ from dearpygui.dearpygui import set_value
 
 #project imports
 from classes.hashmap import *
-import globals
+import data.globals as globals
 
 
 def download_data():
