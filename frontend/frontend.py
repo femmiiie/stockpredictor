@@ -53,7 +53,7 @@ def button_setup():
   predict_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
   credits_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - 2*button_size[1] - 70]
 
-  predict_button = gui.add_button(label="Predict!", width=button_size[0], height=button_size[1], callback=(lambda: swap_visible_screen(3)))
+  predict_button = gui.add_button(label="Predict!", width=button_size[0], height=button_size[1], callback=predict)
   credits_button = gui.add_button(label="Credits", width=button_size[0], height=button_size[1], callback=(lambda: swap_visible_screen(2)))
 
   gui.set_item_pos(predict_button, predict_button_pos)

@@ -61,7 +61,7 @@ def get_stock_list():
         name_list.append(line[0])
         count += 1
         # print(f"Adding stock: {line[0]} (Count: {count})")
-        # set_value(globals.progress_bar, count/503)
+        set_value(globals.progress_bar, count/503)
       
   return name_list
 
@@ -94,7 +94,7 @@ async def pull_stock_info(stock_name : str):
       for line in reader:
         if len(line) == 2: #check if we are done
           break
-        globals.current_stock_data[line[0]] = [float(i) for i in line[1:-1]]
+        globals.current_stock_data[line[0]] = [float(i) for i in line[1:]]
 
 
 #variant of pull stock info that yields all stock maps iteratively
@@ -116,4 +116,4 @@ def stock_info_iter():
         data = HashMap(int(int(line[1])/0.8))
 
       else:
-        data[line[0]] = [float(i) for i in line[1:-1]]
+        data[line[0]] = [float(i) for i in line[1:]]

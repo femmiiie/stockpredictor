@@ -1,6 +1,7 @@
 #stl imports
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
+from os import path
 from time import sleep
 
 #external library imports
@@ -128,3 +129,81 @@ def set_defaults(first_item):
   gui.set_value("search", first_item)
   pull_wrapper()
   
+
+import matplotlib.pyplot as plt
+import numpy as np
+import joblib
+from sklearn.preprocessing import OneHotEncoder
+import pandas as pd
+
+def predict():
+  stock = gui.get_value("search")
+  data = yf.download(stock, period="1mo", group_by="ticker", rounding=True) #get last month of stock activity to seed model
+
+  columns = None
+  feature_columns = None
+  with open("cols.conf", "r", newline="") as file:
+    reader = csv.reader(file, delimiter="|")
+    it = iter(reader)
+    columns = next(it)
+    feature_columns = next(it)
+
+
+  formatted = []
+  for _, row in data[stock].iterrows():
+    if not pd.isna(row.iloc[0]) and row.iloc[0] != 0.0:
+      formatted.append([str(row.name)[:10]] + row.to_list())
+
+  recent_data = pd.DataFrame.from_dict({line[0]: [float(i) for i in line[1:]] for line in formatted}, orient="index", columns=columns)
+  recent_data.index = pd.to_datetime(recent_data.index)
+  recent_data.sort_index(inplace=True)
+  recent_data["Stock_ID"] = stock
+
+  for lag in range(1, 6):
+    recent_data[f"Close_lag_{lag}"] = recent_data["Close"].shift(lag)
+  recent_data = recent_data.dropna()
+
+  model = joblib.load("stock_model.pkl")
+
+  start_date = pd.Timestamp(gui.get_value("start_date"))
+  end_date = pd.Timestamp(gui.get_value("end_date"))
+  future_df = pd.DataFrame(index=pd.date_range(start_date, end_date))
+  future_df["Close"] = None
+
+  encoder = OneHotEncoder(sparse_output=False)
+  stock_id = encoder.fit_transform(recent_data[["Stock_ID"]])
+  stock_df = pd.DataFrame(stock_id, index=recent_data.index, columns=encoder.get_feature_names_out(["Stock_ID"]))
+
+  recent_data = pd.concat([recent_data, stock_df], axis=1)
+
+  # "Predict future prices"
+  last_row = recent_data.iloc[-1][feature_columns].to_frame().T
+  for i in range(len(future_df)):
+    predicted_close = model.predict(last_row)[0]
+
+    if i > 0:
+      historical_volatility = recent_data["Close"].pct_change().std()
+      predicted_close = max(predicted_close, future_df.iloc[i - 1]["Close"] * (1-historical_volatility))
+      predicted_close = min(predicted_close, future_df.iloc[i - 1]["Close"] * (1+historical_volatility))
+
+    future_df.iloc[i, future_df.columns.get_loc("Close")] = predicted_close
+
+    last_row = pd.DataFrame([[
+      predicted_close * np.random.uniform(0.99, 1.01), #Open
+      predicted_close * np.random.uniform(1.00, 1.02), #High
+      predicted_close * np.random.uniform(0.98, 1.00), #Low
+      predicted_close, #Close
+      predicted_close * np.random.uniform(0.98, 1.02), #Adj Close
+      last_row.iloc[0]["Volume"] * np.random.uniform(0.98, 1.02), #Volume
+      *last_row.iloc[0][[f"Close_lag_{lag}" for lag in range(1, 6)]].values.tolist(), #Close Lag 1-5
+      *stock_df.iloc[-1].values
+    ]], columns=feature_columns)
+
+  plt.figure(figsize=(10, 6))
+  plt.plot(future_df.index, future_df["Close"], label="Predicted Prices", color="orange")
+  plt.title("Predicted Future Stock Prices (Next 30 Days)")
+  plt.xlabel("Date")
+  plt.ylabel("Price")
+  plt.legend()
+  plt.grid()
+  plt.show()

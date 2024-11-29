@@ -22,13 +22,13 @@ import data.globals as globals
 from itertools import islice
 
 def train_model():
-  columns = ["Open", "High", "Low", "Close", "Volume"]
+  columns = ["Open", "High", "Low", "Close", "Adj Close", "Volume"]
   all_stocks = []
 
   print("processing stock info")
-  for stock, data in islice(datasets.stock_info_iter(), 5):
+  for stock, data in islice(datasets.stock_info_iter(), 1):
     try:
-      df = pd.DataFrame.from_dict({key: value for key, value in data}, orient="index", columns=columns)
+      df = pd.DataFrame.from_dict(data, orient="index", columns=columns)
     except ValueError as e:
       print("error creating frame")
       raise
@@ -59,7 +59,7 @@ def train_model():
 
 
   train = df.iloc[:-100]
-  test = df.iloc[-100:]
+  test = df.iloc[1::2] #get every other column to better estimate efficacy
 
   X_train, y_train = train[feature_columns], train["Tomorrow"]
 
@@ -70,7 +70,7 @@ def train_model():
     'min_samples_leaf': [1, 2, 4]
   }
    
-  grid_search = GridSearchCV(RandomForestRegressor(random_state=1), param_grid, n_jobs=-1, cv=TimeSeriesSplit(n_splits=5), verbose=1)
+  grid_search = GridSearchCV(RandomForestRegressor(random_state=1, n_jobs=-1), param_grid, n_jobs=-1, cv=TimeSeriesSplit(n_splits=5), verbose=1)
   grid_search.fit(X_train, y_train)
 
   print("best model found")
@@ -93,7 +93,9 @@ def train_model():
 
 
   with open("cols.conf", "w", newline="") as file:
-    csv.writer(file, delimiter='|').writerow(feature_columns)
+    writer = csv.writer(file, delimiter='|')
+    writer.writerow(columns)
+    writer.writerow(feature_columns)
 
   joblib.dump(model, "stock_model.pkl")
 
