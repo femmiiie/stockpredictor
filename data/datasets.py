@@ -95,3 +95,25 @@ async def pull_stock_info(stock_name : str):
         if len(line) == 2: #check if we are done
           break
         globals.current_stock_data[line[0]] = [float(i) for i in line[1:-1]]
+
+
+#variant of pull stock info that yields all stock maps iteratively
+def stock_info_iter():
+  with open("stock_info.csv", mode="r") as file:
+    reader = csv.reader(file, delimiter="|")
+    data = None
+    curr_stock = ""
+
+    for line in reader:
+      if reader.line_num == 1:
+        curr_stock = line[0]
+        data = HashMap(int(int(line[1])/0.8))
+
+      elif len(line) == 2:
+        yield curr_stock, data
+
+        curr_stock = line[0]
+        data = HashMap(int(int(line[1])/0.8))
+
+      else:
+        data[line[0]] = [float(i) for i in line[1:-1]]
