@@ -1,7 +1,8 @@
 #stl imports
-import asyncio
+import csv
 from datetime import timedelta, datetime
 import joblib
+from os import path
 
 #external library imports
 import matplotlib.pyplot as plt
@@ -9,7 +10,8 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, cross_val_score
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
+from sklearn.preprocessing import OneHotEncoder
 
 #project imports
 from classes.hashmap import *
@@ -17,49 +19,83 @@ import data.datasets as datasets
 import data.globals as globals
 
 
-def train_model(stock_data: HashMap):
-   extracted_data = {key: value for key, value in stock_data.items()}
-   columns = ["Open", "High", "Low", "Close", "Volume"]
-   try:
-     df = pd.DataFrame.from_dict(extracted_data, orient="index", columns=columns)
-   except ValueError as e:
-     print("err creating df")
-     raise
+from itertools import islice
+
+def train_model():
+  columns = ["Open", "High", "Low", "Close", "Volume"]
+  all_stocks = []
+
+  print("processing stock info")
+  for stock, data in islice(datasets.stock_info_iter(), 5):
+    try:
+      df = pd.DataFrame.from_dict({key: value for key, value in data}, orient="index", columns=columns)
+    except ValueError as e:
+      print("error creating frame")
+      raise
    
-   df.index = pd.to_datetime(df.index)
-   df.sort_index(inplace=True)
+    df.index = pd.to_datetime(df.index)
+    df.sort_index(inplace=True)
+    df["Stock_ID"] = stock
 
-   df["Tomorrow"] = df["Close"].shift(-1) 
-   for lag in range(1, 6):
-     df[f"Close_lag_{lag}"] = df["Close"].shift(lag)
-   df = df.dropna() 
+    df["Tomorrow"] = df["Close"].shift(-1) 
+    for lag in range(1, 6):
+      df[f"Close_lag_{lag}"] = df["Close"].shift(lag)
+  
+    df = df.dropna()
+    all_stocks.append(df) 
 
-   train = df.iloc[:-100]
-   test = df.iloc[-100:]
+    print(f"done processing {stock}")
 
-   feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 6)]
-   X_train, y_train = train[feature_columns], train["Tomorrow"]
+  df = pd.concat(all_stocks, axis=0)
 
-   param_grid = {
-        'n_estimators': [200, 300],
-        'max_depth': [10, 20, None],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4]
-    }
+  encoder = OneHotEncoder(sparse_output=False)
+  stock_id = encoder.fit_transform(df[["Stock_ID"]])
+  stock_df = pd.DataFrame(stock_id, index=df.index, columns=encoder.get_feature_names_out(["Stock_ID"]))
+
+  df = pd.concat([df, stock_df], axis=1)
+
+  # feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 6)] + ["Stock_ID"] + list(stock_df.columns)
+  feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 6)] + list(stock_df.columns)
+
+
+  train = df.iloc[:-100]
+  test = df.iloc[-100:]
+
+  X_train, y_train = train[feature_columns], train["Tomorrow"]
+
+  param_grid = {
+    'n_estimators': [200, 300],
+    'max_depth': [10, 20, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+  }
    
-   grid_search = GridSearchCV(RandomForestRegressor(random_state=1), param_grid, n_jobs=-1, cv=TimeSeriesSplit(n_splits=5), verbose=1)
-   grid_search.fit(X_train, y_train)
+  grid_search = GridSearchCV(RandomForestRegressor(random_state=1), param_grid, n_jobs=-1, cv=TimeSeriesSplit(n_splits=5), verbose=1)
+  grid_search.fit(X_train, y_train)
 
-   model = grid_search.best_estimator_
-   model.fit(X_train, y_train)
+  print("best model found")
 
-   #prediction quality assessment
-   y_pred = model.predict(test[feature_columns])
-   print(f"MAE: {mean_absolute_error(test['Tomorrow'], y_pred)}")
-   print(f"RMSE: {root_mean_squared_error(test["Tomorrow"], y_pred)}")
-   print(f"R2: {r2_score(test["Tomorrow"], y_pred)}")
+  model = grid_search.best_estimator_
+  model.fit(X_train, y_train)
 
-   joblib.dump(model, "stock_model.pkl")
+  print("model trained")
+
+  #prediction quality assessment
+  y_test = test["Tomorrow"]
+  y_pred = model.predict(test[feature_columns])
+
+  print()
+  print("Efficiency Metrics")
+  print(f"MAE: {mean_absolute_error(y_test, y_pred)}")
+  print(f"RMSE: {root_mean_squared_error(y_test, y_pred)}")
+  print(f"R2: {r2_score(y_test, y_pred)}")
+
+
+
+  with open("cols.conf", "w", newline="") as file:
+    csv.writer(file, delimiter='|').writerow(feature_columns)
+
+  joblib.dump(model, "stock_model.pkl")
 
 
 def visualize_model():
@@ -105,24 +141,9 @@ def visualize_model():
 def train_test():
   datasets.download_data()
 
-  # Get stock list and choose a stock for testing
-  print(f"getting stocks")
-  stock_list = datasets.get_stock_list()
-  # print(f"Available stocks: {stock_list}")
-  print(f"got stocks")
+  print("Calling train model")
+  train_model()
+  print("model trained")
 
-  stock_name = stock_list[0]  # Replace with desired stock or user input
-  print(f"Testing stock: {stock_name}")
-
-  # Load stock data
-  asyncio.run(datasets.pull_stock_info(stock_name))
-
-  # Test the train_model function
-  if globals.current_stock_data is not None:
-    print("Calling train model")
-    train_model(globals.current_stock_data)
-    print("model trained")
-  else:
-    print("Error: No stock data loaded.")
 
 train_test()
