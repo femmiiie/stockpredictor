@@ -26,7 +26,7 @@ def train_model():
   all_stocks = []
 
   print("processing stock info")
-  for stock, data in islice(datasets.stock_info_iter(), 1):
+  for stock, data in datasets.stock_info_iter():
     try:
       df = pd.DataFrame.from_dict(data, orient="index", columns=columns)
     except ValueError as e:
@@ -38,7 +38,7 @@ def train_model():
     df["Stock_ID"] = stock
 
     df["Tomorrow"] = df["Close"].shift(-1) 
-    for lag in range(1, 6):
+    for lag in range(1, 4):
       df[f"Close_lag_{lag}"] = df["Close"].shift(lag)
   
     df = df.dropna()
@@ -47,15 +47,20 @@ def train_model():
     print(f"done processing {stock}")
 
   df = pd.concat(all_stocks, axis=0)
+  df[["Open", "High", "Low", "Close", "Adj Close", "Volume"]] = df[["Open", "High", "Low", "Close", "Adj Close", "Volume"]].astype("float32")
+
 
   encoder = OneHotEncoder(sparse_output=False)
   stock_id = encoder.fit_transform(df[["Stock_ID"]])
   stock_df = pd.DataFrame(stock_id, index=df.index, columns=encoder.get_feature_names_out(["Stock_ID"]))
 
+  df["Stock_ID"] = pd.Categorical(df["Stock_ID"])
+  stock_df = pd.get_dummies(df["Stock_ID"], prefix="Stock_ID")
+
   df = pd.concat([df, stock_df], axis=1)
 
   # feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 6)] + ["Stock_ID"] + list(stock_df.columns)
-  feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 6)] + list(stock_df.columns)
+  feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 4)] + list(stock_df.columns)
 
 
   train = df.iloc[:-100]
@@ -65,12 +70,12 @@ def train_model():
 
   param_grid = {
     'n_estimators': [200, 300],
-    'max_depth': [10, 20, None],
-    'min_samples_split': [2, 5, 10],
-    'min_samples_leaf': [1, 2, 4]
+    'max_depth': [20, None],
+    'min_samples_split': [5, 10],
+    'min_samples_leaf': [2, 4]
   }
    
-  grid_search = GridSearchCV(RandomForestRegressor(random_state=1, n_jobs=-1), param_grid, n_jobs=-1, cv=TimeSeriesSplit(n_splits=5), verbose=1)
+  grid_search = GridSearchCV(RandomForestRegressor(random_state=1, n_jobs=-1, verbose=2), param_grid, n_jobs=4, cv=TimeSeriesSplit(n_splits=5), verbose=2)
   grid_search.fit(X_train, y_train)
 
   print("best model found")
@@ -89,8 +94,6 @@ def train_model():
   print(f"MAE: {mean_absolute_error(y_test, y_pred)}")
   print(f"RMSE: {root_mean_squared_error(y_test, y_pred)}")
   print(f"R2: {r2_score(y_test, y_pred)}")
-
-
 
   with open("cols.conf", "w", newline="") as file:
     writer = csv.writer(file, delimiter='|')
