@@ -144,9 +144,8 @@ def predict():
   feature_columns = None
   with open("cols.conf", "r", newline="") as file:
     reader = csv.reader(file, delimiter="|")
-    it = iter(reader)
-    columns = next(it)
-    feature_columns = next(it)
+    columns = next(reader)
+    feature_columns = next(reader)
 
 
   formatted = []
@@ -159,7 +158,7 @@ def predict():
   recent_data.sort_index(inplace=True)
   recent_data["Stock_ID"] = stock
 
-  for lag in range(1, 6):
+  for lag in range(1, 4):
     recent_data[f"Close_lag_{lag}"] = recent_data["Close"].shift(lag)
   recent_data = recent_data.dropna()
 
@@ -170,13 +169,19 @@ def predict():
   future_df = pd.DataFrame(index=pd.date_range(start_date, end_date))
   future_df["Close"] = None
 
-  encoder = OneHotEncoder(sparse_output=False)
-  stock_id = encoder.fit_transform(recent_data[["Stock_ID"]])
-  stock_df = pd.DataFrame(stock_id, index=recent_data.index, columns=encoder.get_feature_names_out(["Stock_ID"]))
+  # for feature in feature_columns[9:]:
+  #   if feature == f"Stock_ID_{stock.upper()}":
+  #     recent_data[feature] = True
 
-  recent_data = pd.concat([recent_data, stock_df], axis=1)
+  #   else:
+  #     recent_data[feature] = False
 
-  # "Predict future prices"
+  encoded_cols = {feature: (feature == f"Stock_ID_{stock.upper()}") for feature in feature_columns[9:]}
+  recent_data = recent_data.assign(**encoded_cols)
+
+  stock_df = recent_data.filter(like="Stock_ID_")
+
+  #Predict future prices
   last_row = recent_data.iloc[-1][feature_columns].to_frame().T
   for i in range(len(future_df)):
     predicted_close = model.predict(last_row)[0]
@@ -195,7 +200,7 @@ def predict():
       predicted_close, #Close
       predicted_close * np.random.uniform(0.98, 1.02), #Adj Close
       last_row.iloc[0]["Volume"] * np.random.uniform(0.98, 1.02), #Volume
-      *last_row.iloc[0][[f"Close_lag_{lag}" for lag in range(1, 6)]].values.tolist(), #Close Lag 1-5
+      *last_row.iloc[0][[f"Close_lag_{lag}" for lag in range(1, 4)]].values.tolist(), #Close Lag 1-3
       *stock_df.iloc[-1].values
     ]], columns=feature_columns)
 
