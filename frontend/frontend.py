@@ -155,10 +155,9 @@ def credits_setup():
 
 
 def predictor_setup():
-  graph_size = [500, 600]
+  graph_size = [600, 500]
 
-  stock = gui.get_value("search")
-  gui.add_text(f"Stock Prediction for {stock.upper()}:")
+  gui.add_text(f"Stock Prediction for :", tag="pred_label")
 
   with gui.plot(
     tag="prediction",

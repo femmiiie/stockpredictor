@@ -144,25 +144,22 @@ import pandas as pd
 def predict_wrapper():
   reset_loading_screen()
   swap_visible_screen(4)
-  predict()
+  stock, future = predict()
 
-  # print(future)
-  # print(future.index)
-  # print(future["Close"])
+  gui.set_value("pred_label", f"Stock Prediction for {stock.upper()}:")
 
-  # dates = future.index.tolist()
+  dates = [str(i)[:10] for i in future.index.tolist()]
 
-  # gui.delete_item("linear_prediction")
+  gui.delete_item("linear_prediction")
+  gui.set_axis_ticks("p_x_axis", ((dates[0], 0), (dates[-1], len(dates) - 1)))  
+  gui.add_line_series(
+    [i for i in range(len(dates))],
+    future["Close"].tolist(),
+    tag="linear_prediction",
+    parent="p_y_axis"
+  )
 
-  # gui.set_axis_ticks("p_x_axis", ((dates[0], 0), (dates[-1], len(dates) - 1)))
-  # gui.add_line_series(
-  #   [i for i in range(len(dates))],
-  #   future["Close"].tolist(),
-  #   tag="linear_prediction",
-  #   parent="p_y_axis"
-  # )
-
-  # swap_visible_screen(3)
+  swap_visible_screen(3)
 
 
 
@@ -236,13 +233,13 @@ def predict():
 
   gui.set_value(globals.progress_bar, 5/7)
 
-  # return future_df
+  return stock, future_df
 
-  plt.figure(figsize=(10, 6))
-  plt.plot(future_df.index, future_df["Close"], label="Predicted Prices", color="orange")
-  plt.title("Predicted Future Stock Prices (Next 30 Days)")
-  plt.xlabel("Date")
-  plt.ylabel("Price")
-  plt.legend()
-  plt.grid()
-  plt.show()
+  # plt.figure(figsize=(10, 6))
+  # plt.plot(future_df.index, future_df["Close"], label="Predicted Prices", color="orange")
+  # plt.title("Predicted Future Stock Prices (Next 30 Days)")
+  # plt.xlabel("Date")
+  # plt.ylabel("Price")
+  # plt.legend()
+  # plt.grid()
+  # plt.show()
