@@ -11,7 +11,6 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
-from sklearn.preprocessing import OneHotEncoder
 
 #project imports
 from classes.hashmap import *
@@ -50,16 +49,11 @@ def train_model():
   df[["Open", "High", "Low", "Close", "Adj Close", "Volume"]] = df[["Open", "High", "Low", "Close", "Adj Close", "Volume"]].astype("float32")
 
 
-  encoder = OneHotEncoder(sparse_output=False)
-  stock_id = encoder.fit_transform(df[["Stock_ID"]])
-  stock_df = pd.DataFrame(stock_id, index=df.index, columns=encoder.get_feature_names_out(["Stock_ID"]))
-
   df["Stock_ID"] = pd.Categorical(df["Stock_ID"])
   stock_df = pd.get_dummies(df["Stock_ID"], prefix="Stock_ID")
 
   df = pd.concat([df, stock_df], axis=1)
 
-  # feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 6)] + ["Stock_ID"] + list(stock_df.columns)
   feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 4)] + list(stock_df.columns)
 
 
@@ -143,7 +137,7 @@ def visualize_model():
   plt.show()
 
 
-def train_test():
+def train():
   datasets.download_data()
 
   print("Calling train model")
@@ -151,4 +145,4 @@ def train_test():
   print("model trained")
 
 
-train_test()
+train()
