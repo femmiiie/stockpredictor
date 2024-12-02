@@ -40,7 +40,7 @@ def render_front(stocks : Trie):
     credits_setup()
 
   with gui.window(tag="Predictor", show=False):
-    pass
+    predictor_setup()
 
   gui.show_viewport()
   gui.set_primary_window("Loading", True)
@@ -53,7 +53,7 @@ def button_setup():
   predict_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
   credits_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - 2*button_size[1] - 70]
 
-  predict_button = gui.add_button(label="Predict!", width=button_size[0], height=button_size[1], callback=predict)
+  predict_button = gui.add_button(label="Predict!", width=button_size[0], height=button_size[1], callback=predict_wrapper)
   credits_button = gui.add_button(label="Credits", width=button_size[0], height=button_size[1], callback=(lambda: swap_visible_screen(2)))
 
   gui.set_item_pos(predict_button, predict_button_pos)
@@ -145,10 +145,35 @@ def credits_setup():
   gui.add_text("Created by the Soon to be Richest Team in COP3530")
   gui.add_text("")
   gui.add_text("Sandro Mocevic - Frontend Development")
-  gui.add_text("Nouri Clarke - TBD")
-  gui.add_text("Aimar Murua - TBD")
+  gui.add_text("Nouri Clarke - AI Development")
+  gui.add_text("Aimar Murua - Data Analysis")
 
   button_size = [150, 60]
   back_button_pos = [screen_size["width"] - button_size[0] - 50, screen_size["height"] - button_size[1] - 60]
   back_button = gui.add_button(label="Back", width=button_size[0], height=button_size[1], callback=(lambda: swap_visible_screen(1)))
   gui.set_item_pos(back_button, back_button_pos)
+
+
+def predictor_setup():
+  graph_size = [500, 600]
+
+  stock = gui.get_value("search")
+  gui.add_text(f"Stock Prediction for {stock.upper()}:")
+
+  with gui.plot(
+    tag="prediction",
+    width=graph_size[0],
+    height=graph_size[1],
+    no_menus=True, 
+    no_mouse_pos=True, 
+    no_box_select=True,
+    no_inputs=True):
+
+    gui.add_plot_axis(gui.mvXAxis, label='Date', tag='p_x_axis', auto_fit=True)
+    gui.add_plot_axis(gui.mvYAxis, label='Price', tag='p_y_axis', auto_fit=True)
+  
+  with gui.theme() as p_theme:
+    with gui.theme_component(gui.mvAll):
+      gui.add_theme_color(gui.mvThemeCol_FrameBg, (37, 37, 37))
+
+  gui.bind_item_theme("prediction", p_theme)

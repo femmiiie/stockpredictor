@@ -102,7 +102,6 @@ def reset_loading_screen():
   gui.set_value(globals.progress_bar, 0)
 
 
-#very basic state logic since the app only has 3 screens to deal with
 def swap_visible_screen(swap_to : int):
 
   if swap_to == 1:
@@ -121,8 +120,15 @@ def swap_visible_screen(swap_to : int):
   elif swap_to == 3:
     gui.hide_item("Primary")
     gui.hide_item("Credits")
+    gui.hide_item("Loading")
     gui.show_item("Predictor")
     gui.set_primary_window("Predictor", True)
+
+  elif swap_to == 4:
+    gui.hide_item("Primary")
+    gui.hide_item("Credits")
+    gui.show_item("Loading")
+    gui.set_primary_window("Loading", True)
 
 
 def set_defaults(first_item):
@@ -133,8 +139,32 @@ def set_defaults(first_item):
 import matplotlib.pyplot as plt
 import numpy as np
 import joblib
-from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
+
+def predict_wrapper():
+  reset_loading_screen()
+  swap_visible_screen(4)
+  predict()
+
+  # print(future)
+  # print(future.index)
+  # print(future["Close"])
+
+  # dates = future.index.tolist()
+
+  # gui.delete_item("linear_prediction")
+
+  # gui.set_axis_ticks("p_x_axis", ((dates[0], 0), (dates[-1], len(dates) - 1)))
+  # gui.add_line_series(
+  #   [i for i in range(len(dates))],
+  #   future["Close"].tolist(),
+  #   tag="linear_prediction",
+  #   parent="p_y_axis"
+  # )
+
+  # swap_visible_screen(3)
+
+
 
 def predict():
   stock = gui.get_value("search")
@@ -147,6 +177,7 @@ def predict():
     columns = next(reader)
     feature_columns = next(reader)
 
+  gui.set_value(globals.progress_bar, 1/7)
 
   formatted = []
   for _, row in data[stock].iterrows():
@@ -158,28 +189,27 @@ def predict():
   recent_data.sort_index(inplace=True)
   recent_data["Stock_ID"] = stock
 
+  gui.set_value(globals.progress_bar, 2/7) 
+
   for lag in range(1, 4):
     recent_data[f"Close_lag_{lag}"] = recent_data["Close"].shift(lag)
   recent_data = recent_data.dropna()
 
   model = joblib.load("stock_model.pkl")
 
+  gui.set_value(globals.progress_bar, 3/7)
+
   start_date = pd.Timestamp(gui.get_value("start_date"))
   end_date = pd.Timestamp(gui.get_value("end_date"))
   future_df = pd.DataFrame(index=pd.date_range(start_date, end_date))
   future_df["Close"] = None
 
-  # for feature in feature_columns[9:]:
-  #   if feature == f"Stock_ID_{stock.upper()}":
-  #     recent_data[feature] = True
-
-  #   else:
-  #     recent_data[feature] = False
-
   encoded_cols = {feature: (feature == f"Stock_ID_{stock.upper()}") for feature in feature_columns[9:]}
   recent_data = recent_data.assign(**encoded_cols)
 
   stock_df = recent_data.filter(like="Stock_ID_")
+
+  gui.set_value(globals.progress_bar, 4/7)
 
   #Predict future prices
   last_row = recent_data.iloc[-1][feature_columns].to_frame().T
@@ -203,6 +233,10 @@ def predict():
       *last_row.iloc[0][[f"Close_lag_{lag}" for lag in range(1, 4)]].values.tolist(), #Close Lag 1-3
       *stock_df.iloc[-1].values
     ]], columns=feature_columns)
+
+  gui.set_value(globals.progress_bar, 5/7)
+
+  # return future_df
 
   plt.figure(figsize=(10, 6))
   plt.plot(future_df.index, future_df["Close"], label="Predicted Prices", color="orange")
