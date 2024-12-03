@@ -1,12 +1,8 @@
 #stl imports
 import csv
-from datetime import timedelta, datetime
 import joblib
-from os import path
 
 #external library imports
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
@@ -15,10 +11,7 @@ from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 #project imports
 from classes.hashmap import *
 import data.datasets as datasets
-import data.globals as globals
 
-
-from itertools import islice
 
 def train_model():
   columns = ["Open", "High", "Low", "Close", "Adj Close", "Volume"]
@@ -95,46 +88,6 @@ def train_model():
     writer.writerow(feature_columns)
 
   joblib.dump(model, "stock_model.pkl")
-
-
-def visualize_model():
-  current_date = pd.Timestamp(datetime.now()) 
-  start_date = max(df.index[-1], current_date)
-  future_dates = pd.date_range(start=start_date + timedelta(days=1), periods=30)  # 30 days
-
-  future_df = pd.DataFrame(index=future_dates)
-  future_df["Close"] = None
-
-  # "Predict future prices"
-  last_row = df.iloc[-1][feature_columns].to_frame().T
-  for i in range(len(future_df)):
-    predicted_close = model.predict(last_row)[0]
-
-    if i > 0:
-      historical_volatility = df["Close"].pct_change().std()
-      predicted_close = max(predicted_close, future_df.iloc[i - 1]["Close"] * (1-historical_volatility))  
-      predicted_close = min(predicted_close, future_df.iloc[i - 1]["Close"] * (1+historical_volatility))  
-
-    future_df.iloc[i, future_df.columns.get_loc("Close")] = predicted_close
-
-    last_row = pd.DataFrame([[
-      predicted_close,
-      last_row.iloc[0]["Volume"] * np.random.uniform(0.98, 1.02),
-      predicted_close * np.random.uniform(0.99, 1.01),
-      predicted_close * np.random.uniform(1.00, 1.02),
-      predicted_close * np.random.uniform(0.98, 1.00), 
-      *last_row.iloc[0][[f"Close_lag_{lag}" for lag in range(1, 6)]].values.tolist(),
-    ]], columns=feature_columns)
-
-  #Plot with future predictions
-  plt.figure(figsize=(10, 6))
-  plt.plot(future_df.index, future_df["Close"], label="Predicted Prices", color="orange")
-  plt.title("Predicted Future Stock Prices (Next 30 Days)")
-  plt.xlabel("Date")
-  plt.ylabel("Price")
-  plt.legend()
-  plt.grid()
-  plt.show()
 
 
 def train():

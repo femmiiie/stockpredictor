@@ -1,11 +1,13 @@
 #stl imports
 import asyncio
-from datetime import datetime, timedelta
-from os import path
+from datetime import datetime
+import joblib
 from time import sleep
 
 #external library imports
 import dearpygui.dearpygui as gui
+from numpy import random
+import pandas as pd
 
 #project imports
 from classes.hashmap import *
@@ -40,8 +42,9 @@ def pull_wrapper():
     await pull_stock_info(gui.get_value("search"))
     await update_graph()
 
-  sleep(0.1)
+  sleep(0.2)
   asyncio.run(pull())
+
 
 async def update_graph():
   dates = []
@@ -136,11 +139,6 @@ def set_defaults(first_item):
   pull_wrapper()
   
 
-import matplotlib.pyplot as plt
-import numpy as np
-import joblib
-import pandas as pd
-
 def predict_wrapper():
   reset_loading_screen()
   swap_visible_screen(4)
@@ -160,7 +158,6 @@ def predict_wrapper():
   )
 
   swap_visible_screen(3)
-
 
 
 def predict():
@@ -221,12 +218,12 @@ def predict():
     future_df.iloc[i, future_df.columns.get_loc("Close")] = predicted_close
 
     last_row = pd.DataFrame([[
-      predicted_close * np.random.uniform(0.99, 1.01), #Open
-      predicted_close * np.random.uniform(1.00, 1.02), #High
-      predicted_close * np.random.uniform(0.98, 1.00), #Low
+      predicted_close * random.uniform(0.99, 1.01), #Open
+      predicted_close * random.uniform(1.00, 1.02), #High
+      predicted_close * random.uniform(0.98, 1.00), #Low
       predicted_close, #Close
-      predicted_close * np.random.uniform(0.98, 1.02), #Adj Close
-      last_row.iloc[0]["Volume"] * np.random.uniform(0.98, 1.02), #Volume
+      predicted_close * random.uniform(0.98, 1.02), #Adj Close
+      last_row.iloc[0]["Volume"] * random.uniform(0.98, 1.02), #Volume
       *last_row.iloc[0][[f"Close_lag_{lag}" for lag in range(1, 4)]].values.tolist(), #Close Lag 1-3
       *stock_df.iloc[-1].values
     ]], columns=feature_columns)
