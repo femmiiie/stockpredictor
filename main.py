@@ -1,5 +1,3 @@
-from os import path
-
 # External library imports
 import dearpygui.dearpygui as gui
 
