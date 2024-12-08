@@ -11,6 +11,8 @@ to train the model run 'python training.py'
   -it is currently configured to use 4 cores abd uses approx. 32GB of RAM
   -by narrowing the stock count/time period this can be lowered
 
+to test and view the metrics of the model run 'python training.py -metrics'
+
 to run the main program run 'python main.py'
 
 Known Issues:

@@ -13,8 +13,8 @@ from classes.hashmap import *
 import data.datasets as datasets
 
 
-def train_model():
-  columns = ["Open", "High", "Low", "Close", "Adj Close", "Volume"]
+
+def pull_training_data(columns):
   all_stocks = []
 
   print("processing stock info")
@@ -46,6 +46,12 @@ def train_model():
   stock_df = pd.get_dummies(df["Stock_ID"], prefix="Stock_ID")
 
   df = pd.concat([df, stock_df], axis=1)
+  return df, stock_df
+
+
+def train_model():
+  columns = ["Open", "High", "Low", "Close", "Adj Close", "Volume"]
+  df, stock_df = pull_training_data(columns)
 
   feature_columns = columns + [f"Close_lag_{lag}" for lag in range(1, 4)] + list(stock_df.columns)
 
@@ -90,12 +96,45 @@ def train_model():
   joblib.dump(model, "stock_model.pkl")
 
 
+def metrics():
+  with open("cols.conf", "r", newline="") as file:
+    reader = csv.reader(file, delimiter="|")
+    columns = next(reader)
+    feature_columns = next(reader)
+
+  df, stock_df = pull_training_data(columns)
+
+  print("loading model")
+
+  model = joblib.load("stock_model.pkl")
+
+  test = df.groupby("Stock_ID", observed=False).tail(30)
+
+  y_test = test["Tomorrow"]
+  X_test = test[feature_columns]
+
+  y_pred = model.predict(X_test)
+
+  print()
+  print("Efficiency Metrics")
+  print(f"MAE: {mean_absolute_error(y_test, y_pred)}")
+  print(f"RMSE: {root_mean_squared_error(y_test, y_pred)}")
+  print(f"R2: {r2_score(y_test, y_pred)}")
+
+
+import sys
+
+
 def train():
   datasets.download_data()
 
-  print("Calling train model")
-  train_model()
-  print("model trained")
+  if (sys.argv[1] == "-metrics"):
+    metrics()
+
+  else:
+    print("Calling train model")
+    train_model()
+    print("model trained")
 
 
 train()
