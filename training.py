@@ -9,7 +9,6 @@ from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_sco
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 
 #project imports
-from classes.hashmap import *
 import data.datasets as datasets
 
 

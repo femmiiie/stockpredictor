@@ -10,7 +10,6 @@ from dearpygui.dearpygui import set_value
 
 
 #project imports
-from classes.hashmap import *
 import data.globals as globals
 
 
@@ -89,7 +88,7 @@ async def pull_stock_info(stock_name : str):
         return
 
       globals.current_stock_data = None
-      globals.current_stock_data = HashMap(int(int(line_count)/0.7))
+      globals.current_stock_data = {}
 
       for line in reader:
         if len(line) == 2: #check if we are done
@@ -107,13 +106,13 @@ def stock_info_iter():
     for line in reader:
       if reader.line_num == 1:
         curr_stock = line[0]
-        data = HashMap(int(int(line[1])/0.8))
+        data = {}
 
       elif len(line) == 2:
         yield curr_stock, data
 
         curr_stock = line[0]
-        data = HashMap(int(int(line[1])/0.8))
+        data = {}
 
       else:
         data[line[0]] = [float(i) for i in line[1:]]

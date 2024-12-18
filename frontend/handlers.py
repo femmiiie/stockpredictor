@@ -10,7 +10,6 @@ from numpy import random
 import pandas as pd
 
 #project imports
-from classes.hashmap import *
 from classes.trie import *
 from data.datasets import *
 import data.globals as globals
