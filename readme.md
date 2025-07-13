@@ -1,33 +1,67 @@
-Ready to make more money than you could ever imagine?
-Welcome to the world's best stock predictor out there!
+# Stock Predictor
 
-How to Run:
-if you are importing data/a model manually, rename them to stock_info.csv and stock_model.pkl respectively and place them in the root directory
+## Table of Contents
+1. [Overview](#overview)
+2. [Metrics](#metrics-from-model-trained-december-2024)
+3. [Usage](#usage)
+4. [Training/Testing](#trainingtesting)
+5. [Issues](#known-issues)
+6. [Dependencies](#dependencies)
+7. [Authors](#authors)
+8. [License](#license)
 
-if no stock_info.csv file is present, running either file below will automatically pull the data if needed
-  -which data you want to pull can be changed by editing lines 22-24 of datasets.py
 
-to train the model run 'python training.py'
-  -it is currently configured to use 4 cores abd uses approx. 32GB of RAM
-  -by narrowing the stock count/time period this can be lowered
+# Overview
+Basic Random Forest Regression stock predictor using Python and scikit-learn.
+Uses a Grid Search Cross Validator with 16 possible configurations to find the best fit model.
 
-to test and view the metrics of the model run 'python training.py -metrics'
 
-to run the main program run 'python main.py'
+# Metrics (From model trained December 2024)
+- Mean Average Error (MAE):      1.3335
+- Root Mean Square Error (RMSE): 4.6514
+- R Squared:                     99.991%
 
-Known Issues:
-  -selecting a stock may cause an incorrect historical graph to show
-  -the frontend may have certain moments where callbacks may seem unresponsive
-  -pressing predict with no stock_model.pkl file will throw an error
 
-Dependencies:
-pandas
-numpy
-dearpygui
-yfinance
-scikit-learn
+# Usage
+If importing a model or data manually, rename the files to stock_model.pkl and stock_info.csv respectively and place them in the root directory
 
-Created by:
-Sandro Mocevic
-Aimar Murua
-Nouri Clarke
+If no stock_info.csv file is present, running either training.py or main.py will automatically pull the data.
+The unmodified program will pull all tickers from the Wikipedia S&P500 list and get all YFinance data from 01/01/2010 to the present day. To modify this, edit lines 22-24 of datasets.py
+
+Use `python main.py` to run the main GUI program.
+
+
+# Training/Testing
+Use `python training.py`
+  Unmodified, the training process uses 4 cores and approx. 32GB of RAM. 
+  The RAM usage can be lowered by either changing n_jobs=4 on line 70 of training.py or narrowing the dataset.
+
+After training, the Efficiency Metrics will be printed to the console.
+To view the metrics without retraining, use 
+'''shell
+python training.py -metrics
+'''
+
+
+# Known Issues
+- Selecting a stock may cause an incorrect historical graph to show
+- The frontend may have certain moments where callbacks may seem unresponsive
+- Pressing predict with no stock_model.pkl file will throw an error
+
+
+# Dependencies
+- [pandas](https://pandas.pydata.org/)
+- [numpy](https://numpy.org/)
+- [dearpygui](https://github.com/hoffstadt/DearPyGui)
+- [yfinance](https://pypi.org/project/yfinance/)
+- [scikit-learn](https://scikit-learn.org/stable/)
+
+
+# Authors
+- **Sandro Mocevic**
+- **Aimar Murua**
+- **Nouri Clarke**
+
+
+# License
+This repository has a 'Do Whatever You Want With It' License. This project was created as a challenge for the authors' own learning within a classroom environment, and may have oversights that come as a result of class deadlines.

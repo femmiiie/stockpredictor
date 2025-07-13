@@ -20,7 +20,7 @@ def download_data():
   #edit if you want to pull custom data, we use the full list of current S&P 500 companies
   url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
   sp500_tickers = pd.read_html(url)[0]['Symbol'].tolist()
-  data : pd.DataFrame = yf.download(sp500_tickers, start="2010-01-01", end="2024-11-7", group_by='ticker', rounding=True)
+  data : pd.DataFrame = yf.download(sp500_tickers, start="2010-01-01", group_by='ticker', rounding=True)
   failed = [stock for stock in sp500_tickers if stock not in data.columns.levels[0]]
 
   total_stocks = len(sp500_tickers) - len(failed)
